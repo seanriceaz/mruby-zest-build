@@ -152,7 +152,8 @@ build_type.new(build_name) do |conf|
           linker.libraries << 'X11'
           linker.flags_after_libraries << `pkg-config --libs libuv`.strip
         else
-          linker.flags_after_libraries  << "#{`pwd`.strip}/../deps/libuv.a"
+          linker.flags_after_libraries << `pkg-config --libs libuv`.strip
+          #linker.flags_after_libraries  << "#{`pwd`.strip}/../deps/libuv.a"
         end
         linker.flags_after_libraries  << "-lpthread -ldl -lm"
       else

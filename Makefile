@@ -31,9 +31,18 @@ osx: deps/libuv.a
 	ruby ./rebuild-fcache.rb
 	cd deps/nanovg/src   && $(CC) nanovg.c -c -fPIC
 	$(AR) rc deps/libnanovg.a deps/nanovg/src/*.o
-	cd deps/pugl         && python2 ./waf configure --no-cairo --static
+
+#	cd deps/pugl         && python ./waf configure --no-cairo --static
 #	cd deps/pugl         && python2 ./waf configure --no-cairo --static --debug
-	cd deps/pugl         && python2 ./waf
+#	cd deps/pugl         && python ./waf
+# Bypass the PUGL waf code.
+	cd deps/pugl && rm -rf build && mkdir build
+	cd deps/pugl/pugl; \
+	$(CXX) \
+	-DNDEBUG -fshow-column -I../ -DHAVE_GL=1 -DPUGL_HAVE_GL=1 -DPUGL_VERSION="0.2.0" pugl_osx.m \
+	-c -o ../build/pugl_osx.m.2.o
+	cd deps/pugl/build/ && $(AR) rcs libpugl-0.a pugl_osx.m.2.o
+
 	cd src/osc-bridge    && CFLAGS="-I ../../deps/libuv/include " make lib
 	cd mruby             && MRUBY_CONFIG=../build_config.rb rake
 	$(CC) -shared -o libzest.so `find mruby/build/host -type f | grep -v mrbc | grep -e "\.o$$" | grep -v bin` ./deps/libnanovg.a \
